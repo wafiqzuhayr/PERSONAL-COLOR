@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Find Your Personal Color - Wardah Color Expert')
+@section('title', 'Find Your Personal Color Analyzer - COLOR TEST 6')
 
 @push('styles')
 <style>
@@ -154,9 +154,9 @@
 <!-- Decorative Elements -->
 <div class="decoration decoration-1">
     <svg width="150" height="150" viewBox="0 0 150 150">
-        <circle cx="50" cy="50" r="40" fill="#FF6B9D" opacity="0.6"/>
-        <circle cx="100" cy="70" r="35" fill="#C17B8B" opacity="0.7"/>
-        <circle cx="80" cy="100" r="30" fill="#FFB6C1" opacity="0.5"/>
+        <circle cx="50" cy="50" r="40" fill="#00e5ffff" opacity="0.6"/>
+        <circle cx="100" cy="70" r="35" fill="#00ff2aff" opacity="0.7"/>
+        <circle cx="80" cy="100" r="30" fill="#ff0026ff" opacity="0.5"/>
     </svg>
 </div>
 

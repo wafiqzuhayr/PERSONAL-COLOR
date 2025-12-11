@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+<<<<<<< HEAD:app/Http/Http/PersonalColorController.php
 use Illuminate\Foundation\Http\Controller as BaseController;
+=======
+use Illuminate\Routing\Controller;
+
+use Illuminate\Http\Request;
+>>>>>>> 63f6901b044bc60a39697bae2ae098d0e9cacb56:app/Http/Controllers/PersonalColorController.php
 
 class Controller extends BaseController
 {

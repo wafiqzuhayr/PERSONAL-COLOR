@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Color Analyzer - Wardah Color Expert</title>
+    <title>Personal Color Analyzer - COLOR TEST 6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -24,7 +24,7 @@
                     </linearGradient>
                 </defs>
                 <circle cx="100" cy="100" r="80" fill="url(#grad1)"/>
-                <circle cx="60" cy="80" r="50" fill="#fbcfe8" opacity="0.7"/>
+                <circle cx="60" cy="80" r="50" fill="#004cffff" opacity="0.7"/>
             </svg>
         </div>
 
@@ -38,7 +38,7 @@
                     </linearGradient>
                 </defs>
                 <circle cx="100" cy="100" r="85" fill="url(#grad2)"/>
-                <circle cx="140" cy="120" r="55" fill="#e9d5ff" opacity="0.6"/>
+                <circle cx="140" cy="120" r="55" fill="#ff2200ff" opacity="0.6"/>
             </svg>
         </div>
 
@@ -52,7 +52,7 @@
                     </linearGradient>
                 </defs>
                 <circle cx="100" cy="100" r="90" fill="url(#grad3)"/>
-                <circle cx="50" cy="130" r="60" fill="#fbcfe8" opacity="0.5"/>
+                <circle cx="50" cy="130" r="60" fill="#0040ffff" opacity="0.5"/>
             </svg>
         </div>
 
@@ -66,7 +66,7 @@
                     </linearGradient>
                 </defs>
                 <circle cx="100" cy="100" r="85" fill="url(#grad4)"/>
-                <circle cx="130" cy="60" r="50" fill="#fecaca" opacity="0.4"/>
+                <circle cx="130" cy="60" r="50" fill="#ff0000ff" opacity="0.4"/>
             </svg>
         </div>
 
@@ -75,7 +75,7 @@
             <div class="max-w-2xl w-full text-center">
                 <!-- Header -->
                 <div class="mb-8">
-                    <p class="text-xl font-light text-amber-900 mb-2 tracking-wider">Wardah</p>
+                    <p class="text-xl font-light text-amber-900 mb-2 tracking-wider">COLOR TEST 6</p>
                     <p class="text-sm font-semibold text-amber-800 tracking-widest mb-8">COLOR EXPERT</p>
                 </div>
 
