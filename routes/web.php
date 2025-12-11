@@ -1,28 +1,29 @@
 <?php
-// routes/web.php
 
-use App\Http\Controllers\PersonalColorController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PersonalColorController;
 
-// Route Personal Color
-Route::get('/personalcolor/basic/start', [PersonalColorController::class, 'basicStart'])
-    ->name('personalcolor.basic.start');
+Route::get('/', function () {
+    return view('welcome');
+});
 
-Route::get('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'skinTone'])
-    ->name('personalcolor.basic.skin-tone');
+// Personal Color Home
+Route::get('/personalcolor', [PersonalColorController::class, 'home'])->name('personalcolor.home');
 
-Route::post('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'storeSkinTone'])
-    ->name('personalcolor.basic.store-skin-tone');
+// Personal Color Basic
+Route::get('/personalcolor/basic/start', [PersonalColorController::class, 'basicStart'])->name('personalcolor.basic.start');
 
-Route::get('/personalcolor/basic/questions', [PersonalColorController::class, 'questions'])
-    ->name('personalcolor.basic.questions');
+Route::get('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'skinTone'])->name('personalcolor.basic.skin-tone');
+Route::post('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'storeSkinTone'])->name('personalcolor.basic.store-skin-tone');
 
-Route::post('/personalcolor/basic/questions', [PersonalColorController::class, 'storeQuestions'])
-    ->name('personalcolor.basic.store-questions');
+Route::get('/personalcolor/basic/questions', [PersonalColorController::class, 'questions'])->name('personalcolor.basic.questions');
+Route::post('/personalcolor/basic/questions', [PersonalColorController::class, 'storeQuestions'])->name('personalcolor.basic.store-questions');
 
-Route::get('/personalcolor/basic/result', [PersonalColorController::class, 'result'])
-    ->name('personalcolor.basic.result'); 
+Route::get('/personalcolor/basic/result', [PersonalColorController::class, 'result'])->name('personalcolor.basic.result');
+Route::post('/personalcolor/basic/save-result', [PersonalColorController::class, 'saveResult'])->name('personalcolor.basic.save-result');
+Route::post('/personalcolor/basic/reset', [PersonalColorController::class, 'resetSession'])->name('personalcolor.basic.reset');
 
-Route::post('/personalcolor/basic/reset', [PersonalColorController::class, 'resetSession'])
-    ->name('personalcolor.basic.reset');
-   
+// Admin Routes
+Route::get('/personalcolor/results', [PersonalColorController::class, 'getAllResults'])->name('personalcolor.results');
+Route::get('/personalcolor/results/{id}', [PersonalColorController::class, 'showResult'])->name('personalcolor.show-result');
+Route::delete('/personalcolor/results/{id}', [PersonalColorController::class, 'deleteResult'])->name('personalcolor.delete-result');

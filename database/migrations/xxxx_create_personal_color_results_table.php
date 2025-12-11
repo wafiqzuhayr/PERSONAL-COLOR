@@ -12,19 +12,50 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('personal_color_results', function (Blueprint $table) {
+            // Primary Key
             $table->id();
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone', 20);
-            $table->string('photo_path');
-            $table->string('skin_tone', 50);
-            $table->json('undertones');
-            $table->string('color_type', 20);
-            $table->boolean('accept_marketing')->default(false);
-            $table->timestamps();
+
+            // User Information
+            $table->string('name', 255)->comment('Nama lengkap user');
+            $table->string('email', 255)->unique()->comment('Email user');
+            $table->string('phone', 20)->nullable()->comment('Nomor telepon');
+            $table->string('photo_path')->nullable()->comment('Path foto profil');
+
+            // Color Analysis Data
+            $table->enum('skin_tone', ['warm', 'cool', 'neutral'])
+                  ->comment('Tone kulit user (warm/cool/neutral)');
             
-            // Indexes untuk improve performance
+            $table->string('hair_color', 100)
+                  ->comment('Warna rambut user');
+            
+            $table->string('eye_color', 100)
+                  ->comment('Warna mata user');
+            
+            $table->enum('skin_brightness', ['very_fair', 'fair', 'medium', 'tan', 'deep'])
+                  ->comment('Tingkat kecerahan kulit');
+            
+            $table->enum('contrast_level', ['high', 'medium', 'low'])
+                  ->comment('Level kontras antara rambut, kulit, mata');
+            
+            $table->enum('saturation', ['muted', 'medium', 'vibrant'])
+                  ->comment('Tingkat saturasi warna kulit');
+            
+            $table->enum('color_type', ['spring', 'summer', 'autumn', 'winter'])
+                  ->comment('Tipe warna musiman (seasonal color)');
+
+            // Additional Information
+            $table->text('notes')->nullable()
+                  ->comment('Catatan tambahan dari user');
+            
+            $table->boolean('accept_marketing')->default(false)
+                  ->comment('Apakah user setuju menerima marketing');
+
+            // Timestamps
+            $table->timestamps();
+
+            // Indexes
             $table->index('email');
+            $table->index('skin_tone');
             $table->index('color_type');
             $table->index('created_at');
         });
