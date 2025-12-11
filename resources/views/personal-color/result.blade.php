@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -348,4 +348,4 @@
     </div>
 </div>
 @endsection
->>>>>>> e573eb43e36b7b53103681004ea83fb2be061be3
+
