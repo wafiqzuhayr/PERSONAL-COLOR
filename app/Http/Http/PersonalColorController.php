@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PersonalColorResult;
-
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PersonalColorController extends Controller
 {
@@ -14,84 +11,106 @@ class PersonalColorController extends Controller
      */
     public function home()
     {
-        return view('personalcolor.home');
+        return view('personal-color.home');
     }
 
     /**
-     * Halaman awal Personal Color (Basic)
+     * Halaman welcome
+     */
+    public function welcome()
+    {
+        return view('welcome');
+    }
+
+    /**
+     * Halaman start (awal analisis)
      */
     public function basicStart()
     {
-        return view('personalcolor.basic.start');
+        session()->forget(['skin_tone', 'undertone', 'questions']);
+        return view('personal-color.basic-start');
+    }
+
+    public function start()
+    {
+        session()->forget(['skin_tone', 'undertone', 'questions']);
+        return view('personal-color.start');
     }
 
     /**
-     * Halaman pemilihan tone kulit
+     * Halaman pilih skin tone
      */
     public function skinTone()
     {
-        return view('personalcolor.basic.skin-tone');
+        return view('personal-color.skin-tone');
     }
 
     /**
-     * Halaman pertanyaan detail
-     */
-    public function questions()
-    {
-        return view('personalcolor.basic.questions');
-    }
-
-    /**
-     * Proses form skin tone dan lanjut ke questions
+     * Simpan skin tone ke session
      */
     public function storeSkinTone(Request $request)
     {
         $validated = $request->validate([
-            'skin_tone' => 'required|in:warm,cool,neutral',
-        ], [
-            'skin_tone.required' => 'Mohon pilih tone kulit Anda',
-            'skin_tone.in' => 'Pilihan tone kulit tidak valid',
+            'skin_tone' => 'required|in:fair,light,medium,tan,deep,dark'
         ]);
 
-        // Simpan ke session
         session(['skin_tone' => $validated['skin_tone']]);
+        return redirect()->route('personalcolor.basic.questions');
+    }
 
-        return redirect()->route('personalcolor.basic.questions')
-                       ->with('success', 'Tone kulit berhasil disimpan');
+    public function submitSkinTone(Request $request)
+    {
+        $validated = $request->validate([
+            'skin_tone' => 'required|in:fair,light,medium,tan,deep,dark'
+        ]);
+
+        session(['skin_tone' => $validated['skin_tone']]);
+        return redirect()->route('personal-color.undertone');
     }
 
     /**
-     * Proses form questions dan tampilkan hasil
+     * Halaman pertanyaan tambahan
+     */
+    public function questions()
+    {
+        return view('personal-color.questions');
+    }
+
+    /**
+     * Simpan jawaban pertanyaan
      */
     public function storeQuestions(Request $request)
     {
         $validated = $request->validate([
-            'skin_tone' => 'required|in:warm,cool,neutral',
             'hair_color' => 'required|string',
             'eye_color' => 'required|string',
-            'skin_brightness' => 'required|string',
-            'contrast_level' => 'required|in:high,medium,low',
-            'saturation' => 'required|in:muted,medium,vibrant',
-            'notes' => 'nullable|string|max:500',
-        ], [
-            'hair_color.required' => 'Mohon pilih warna rambut Anda',
-            'eye_color.required' => 'Mohon pilih warna mata Anda',
-            'skin_brightness.required' => 'Mohon pilih kecerahan kulit Anda',
-            'contrast_level.required' => 'Mohon pilih level kontras Anda',
-            'saturation.required' => 'Mohon pilih tingkat saturasi Anda',
+            'vein_color' => 'required|in:blue,green,red',
+            'metal_preference' => 'required|in:gold,silver,both'
         ]);
 
-        // Simpan semua data ke session
-        foreach ($validated as $key => $value) {
-            session([$key => $value]);
-        }
+        session(['questions' => $validated]);
+        return redirect()->route('personalcolor.basic.result');
+    }
 
-        // Analisis dan hitung hasil
-        $analysisResult = $this->analyzePersonalColor($validated);
+    /**
+     * Halaman pilih undertone
+     */
+    public function undertone()
+    {
+        return view('personal-color.undertone');
+    }
 
-        return redirect()->route('personalcolor.basic.result')
-                       ->with('analysis', $analysisResult)
-                       ->with('success', 'Analisis berhasil dilakukan');
+    /**
+     * Simpan undertone ke session
+     */
+    public function submitUndertone(Request $request)
+    {
+        $validated = $request->validate([
+            'undertone' => 'required|in:cool,warm,neutral'
+        ]);
+
+        session(['undertone' => $validated['undertone']]);
+        return redirect()->route('personal-color.result');
     }
 
     /**
@@ -99,275 +118,122 @@ class PersonalColorController extends Controller
      */
     public function result()
     {
-        $skinTone = session('skin_tone', 'warm');
-        $hairColor = session('hair_color', '');
-        $eyeColor = session('eye_color', '');
-        $skinBrightness = session('skin_brightness', '');
-        $contrastLevel = session('contrast_level', '');
-        $saturation = session('saturation', '');
-        $notes = session('notes', '');
-        $analysis = session('analysis', []);
+        $skinTone = session('skin_tone');
+        $undertone = session('undertone');
+        $questions = session('questions', []);
 
-        return view('personalcolor.basic.result', [
+        if (!$skinTone || !$undertone) {
+            return redirect()->route('personal-color.start');
+        }
+
+        $colorType = $this->determineColorType($skinTone, $undertone);
+
+        return view('personal-color.result', [
+            'colorType' => $colorType,
             'skinTone' => $skinTone,
-            'hairColor' => $hairColor,
-            'eyeColor' => $eyeColor,
-            'skinBrightness' => $skinBrightness,
-            'contrastLevel' => $contrastLevel,
-            'saturation' => $saturation,
-            'notes' => $notes,
-            'analysis' => $analysis,
+            'undertone' => $undertone,
+            'questions' => $questions
         ]);
     }
 
     /**
-     * Simpan hasil ke database
+     * Halaman selesai
+     */
+    public function complete()
+    {
+        return view('personal-color.complete');
+    }
+
+    /**
+     * Simpan hasil analisis
      */
     public function saveResult(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:personal_color_results,email',
-            'phone' => 'nullable|string|max:20',
-            'accept_marketing' => 'boolean',
-        ], [
-            'name.required' => 'Nama harus diisi',
-            'email.required' => 'Email harus diisi',
-            'email.email' => 'Format email tidak valid',
-            'email.unique' => 'Email sudah terdaftar',
+            'email' => 'required|email|max:255'
         ]);
 
-        try {
-            // Ambil data dari session
-            $validated['skin_tone'] = session('skin_tone');
-            $validated['hair_color'] = session('hair_color');
-            $validated['eye_color'] = session('eye_color');
-            $validated['skin_brightness'] = session('skin_brightness');
-            $validated['contrast_level'] = session('contrast_level');
-            $validated['saturation'] = session('saturation');
-            $validated['notes'] = session('notes');
-            $validated['color_type'] = $this->determineColorType(
-                session('skin_brightness'),
-                session('contrast_level'),
-                session('saturation')
-            );
-
-            // Handle photo upload
-            if ($request->hasFile('photo')) {
-                $file = $request->file('photo');
-                $path = $file->store('personal-colors', 'public');
-                $validated['photo_path'] = $path;
-            }
-
-            // Simpan ke database
-            PersonalColorResult::create($validated);
-
-            // Clear session
-            session()->forget([
-                'skin_tone',
-                'hair_color',
-                'eye_color',
-                'skin_brightness',
-                'contrast_level',
-                'saturation',
-                'notes',
-                'analysis',
-            ]);
-
-            return redirect()->route('personalcolor.home')
-                           ->with('success', 'Hasil analisis berhasil disimpan! Terima kasih telah menggunakan layanan kami.');
-        } catch (\Exception $e) {
-            return back()
-                   ->with('error', 'Terjadi kesalahan saat menyimpan data. Silahkan coba lagi.')
-                   ->withInput();
-        }
-    }
-
-    /**
-     * Analisis personal color berdasarkan data yang dikirim
-     */
-    private function analyzePersonalColor($data)
-    {
-        $skinTone = $data['skin_tone'];
-        $brightness = $data['skin_brightness'];
-        $contrast = $data['contrast_level'];
-        $saturation = $data['saturation'];
-
-        // Tentukan kategori seasonal color
-        $seasonalColor = $this->determineSeasonalColor($brightness, $contrast, $saturation);
-
-        // Tentukan recommended colors
-        $recommendedColors = $this->getRecommendedColors($skinTone, $seasonalColor, $saturation);
-
-        // Tentukan metal
-        $metal = $this->determineMetal($skinTone);
-
-        // Tentukan deskripsi
-        $description = $this->getColorDescription($seasonalColor);
-
-        return [
-            'seasonal_color' => $seasonalColor,
-            'recommended_colors' => $recommendedColors,
-            'metal' => $metal,
-            'brightness' => $brightness,
-            'contrast' => $contrast,
-            'saturation' => $saturation,
-            'description' => $description,
-        ];
-    }
-
-    /**
-     * Tentukan seasonal color (Spring, Summer, Autumn, Winter)
-     */
-    private function determineSeasonalColor($brightness, $contrast, $saturation)
-    {
-        if ($brightness === 'very_fair' || $brightness === 'fair') {
-            if ($saturation === 'muted') {
-                return 'summer';
-            } elseif ($saturation === 'vibrant') {
-                return 'spring';
-            } else {
-                return 'summer';
-            }
-        } elseif ($brightness === 'medium' || $brightness === 'tan') {
-            if ($saturation === 'muted') {
-                return 'autumn';
-            } elseif ($saturation === 'vibrant') {
-                return 'spring';
-            } else {
-                return 'autumn';
-            }
-        } else {
-            // deep
-            if ($saturation === 'vibrant') {
-                return 'winter';
-            } else {
-                return 'autumn';
-            }
-        }
-    }
-
-    /**
-     * Tentukan tipe warna untuk database
-     */
-    private function determineColorType($brightness, $contrast, $saturation)
-    {
-        return $this->determineSeasonalColor($brightness, $contrast, $saturation);
-    }
-
-    /**
-     * Dapatkan deskripsi untuk seasonal color
-     */
-    private function getColorDescription($seasonalColor)
-    {
-        $descriptions = [
-            'spring' => 'Anda memiliki warna musim semi yang cerah dan hangat. Warna-warna yang cocok adalah yang memiliki energi tinggi dan kehangatan golden.',
-            'summer' => 'Anda memiliki warna musim panas yang lembut dan sejuk. Warna-warna pastel dan tone dingin akan membuat Anda bersinar.',
-            'autumn' => 'Anda memiliki warna musim gugur yang kaya dan hangat. Warna-warna earth tone dan kehangatan akan menjadi pilihan terbaik.',
-            'winter' => 'Anda memiliki warna musim dingin yang tajam dan dingin. Warna-warna tegas dan kontras tinggi akan menonjolkan keindahan Anda.',
+        $result = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'skin_tone' => session('skin_tone'),
+            'undertone' => session('undertone'),
+            'questions' => session('questions'),
+            'color_type' => $this->determineColorType(
+                session('skin_tone'),
+                session('undertone')
+            ),
+            'created_at' => now()
         ];
 
-        return $descriptions[$seasonalColor] ?? '';
+        session(['saved_result' => $result]);
+        return redirect()->route('personal-color.complete');
     }
 
     /**
-     * Dapatkan recommended colors berdasarkan analysis
-     */
-    private function getRecommendedColors($skinTone, $seasonalColor, $saturation)
-    {
-        $colors = [];
-
-        if ($skinTone === 'warm') {
-            $colors = [
-                'primary' => ['#FFA500', '#FFD700', '#FF8C00', '#CD853F', '#FF6347', '#8B4513'],
-                'secondary' => ['#DC143C', '#FF4500', '#DAA520', '#ADFF2F', '#FF7F50'],
-            ];
-        } elseif ($skinTone === 'cool') {
-            $colors = [
-                'primary' => ['#4169E1', '#9370DB', '#FF69B4', '#00CED1', '#8B008B', '#FF1493'],
-                'secondary' => ['#DC143C', '#00BFFF', '#F0F8FF', '#BA55D3', '#48D1CC'],
-            ];
-        } else {
-            // neutral
-            $colors = [
-                'primary' => ['#20B2AA', '#9932CC', '#696969', '#708090', '#FF1493', '#4169E1'],
-                'secondary' => ['#00CED1', '#A9A9A9', '#F5F5F5', '#DAA520', '#DC143C'],
-            ];
-        }
-
-        return $colors;
-    }
-
-    /**
-     * Tentukan metal yang cocok (gold atau silver)
-     */
-    private function determineMetal($skinTone)
-    {
-        return match($skinTone) {
-            'warm' => 'Gold',
-            'cool' => 'Silver',
-            'neutral' => 'Keduanya cocok',
-            default => 'Gold',
-        };
-    }
-
-    /**
-     * Reset session dan kembali ke awal
-     */
-    public function resetSession()
-    {
-        session()->forget([
-            'skin_tone',
-            'hair_color',
-            'eye_color',
-            'skin_brightness',
-            'contrast_level',
-            'saturation',
-            'notes',
-            'analysis',
-        ]);
-
-        return redirect()->route('personalcolor.home')
-                       ->with('success', 'Data telah direset');
-    }
-
-    /**
-     * Get color results - untuk halaman admin/dashboard
+     * Ambil semua hasil analisis (Admin)
      */
     public function getAllResults()
     {
-        $results = PersonalColorResult::orderBy('created_at', 'desc')->paginate(15);
-        return view('personalcolor.admin.results', compact('results'));
+        $results = [];
+        return view('personal-color.results', ['results' => $results]);
     }
 
     /**
-     * Show single result - untuk halaman admin/dashboard
+     * Tampilkan satu hasil analisis
      */
     public function showResult($id)
     {
-        $result = PersonalColorResult::findOrFail($id);
-        return view('personalcolor.admin.show', compact('result'));
+        // $result = PersonColorResult::findOrFail($id);
+        // return view('personal-color.show-result', ['result' => $result]);
     }
 
     /**
-     * Delete result - untuk halaman admin/dashboard
+     * Hapus hasil analisis
      */
     public function deleteResult($id)
     {
-        try {
-            $result = PersonalColorResult::findOrFail($id);
-            
-            // Delete file jika ada
-            if ($result->photo_path) {
-                Storage::disk('public')->delete($result->photo_path);
-            }
-            
-            $result->delete();
-            
-            return redirect()->route('personalcolor.results')
-                           ->with('success', 'Data berhasil dihapus');
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan saat menghapus data');
-        }
+        // PersonColorResult::findOrFail($id)->delete();
+        // return redirect()->route('personalcolor.results');
+    }
+
+    /**
+     * Reset session
+     */
+    public function resetSession()
+    {
+        session()->forget(['skin_tone', 'undertone', 'questions', 'saved_result']);
+        return redirect()->route('personalcolor.home');
+    }
+
+    /**
+     * Tentukan tipe warna berdasarkan skin tone dan undertone
+     */
+    private function determineColorType($skinTone, $undertone)
+    {
+        $colorTypes = [
+            'fair_cool' => 'Summer',
+            'fair_warm' => 'Spring',
+            'fair_neutral' => 'Soft Summer',
+            'light_cool' => 'Summer',
+            'light_warm' => 'Spring',
+            'light_neutral' => 'Soft Summer',
+            'medium_cool' => 'Summer',
+            'medium_warm' => 'Autumn',
+            'medium_neutral' => 'Soft Autumn',
+            'tan_cool' => 'Cool Winter',
+            'tan_warm' => 'Warm Autumn',
+            'tan_neutral' => 'Soft Autumn',
+            'deep_cool' => 'Winter',
+            'deep_warm' => 'Deep Autumn',
+            'deep_neutral' => 'Deep Winter',
+            'dark_cool' => 'Winter',
+            'dark_warm' => 'Deep Autumn',
+            'dark_neutral' => 'Deep Winter'
+        ];
+
+        $key = "{$skinTone}_{$undertone}";
+        return $colorTypes[$key] ?? 'Neutral';
     }
 }
