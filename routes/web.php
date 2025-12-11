@@ -1,28 +1,21 @@
 <?php
-// routes/web.php
 
 use App\Http\Controllers\PersonalColorController;
 use Illuminate\Support\Facades\Route;
 
-// Route Personal Color
-Route::get('/personalcolor/basic/start', [PersonalColorController::class, 'basicStart'])
-    ->name('personalcolor.basic.start');
+Route::get('/', [PersonalColorController::class, 'welcome'])->name('home');
 
-Route::get('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'skinTone'])
-    ->name('personalcolor.basic.skin-tone');
+Route::prefix('personal-color')->name('personal-color.')->group(function () {
 
-Route::post('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'storeSkinTone'])
-    ->name('personalcolor.basic.store-skin-tone');
+    Route::get('/start', [PersonalColorController::class, 'start'])->name('start');
 
-Route::get('/personalcolor/basic/questions', [PersonalColorController::class, 'questions'])
-    ->name('personalcolor.basic.questions');
+    Route::get('/skin-tone', [PersonalColorController::class, 'skinTone'])->name('skin-tone');
+    Route::post('/skin-tone', [PersonalColorController::class, 'submitSkinTone'])->name('skin-tone.submit');
 
-Route::post('/personalcolor/basic/questions', [PersonalColorController::class, 'storeQuestions'])
-    ->name('personalcolor.basic.store-questions');
+    Route::get('/undertone', [PersonalColorController::class, 'undertone'])->name('undertone');
+    Route::post('/undertone', [PersonalColorController::class, 'submitUndertone'])->name('undertone.submit');
 
-Route::get('/personalcolor/basic/result', [PersonalColorController::class, 'result'])
-    ->name('personalcolor.basic.result'); 
+    Route::get('/result', [PersonalColorController::class, 'result'])->name('result');
 
-Route::post('/personalcolor/basic/reset', [PersonalColorController::class, 'resetSession'])
-    ->name('personalcolor.basic.reset');
-   
+    Route::get('/complete', [PersonalColorController::class, 'complete'])->name('complete');
+});

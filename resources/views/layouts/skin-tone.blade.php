@@ -1,0 +1,36 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">Step 1: Pilih Skin Tone</h2>
+
+    <form method="POST" action="{{ route('personal-color.skin-tone.submit') }}">
+        @csrf
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-3 text-center">
+                <input type="radio" name="skin" value="light" required>
+                <p>Light</p>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <input type="radio" name="skin" value="medium">
+                <p>Medium</p>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <input type="radio" name="skin" value="dark">
+                <p>Dark</p>
+            </div>
+
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-primary">Next</button>
+        </div>
+
+    </form>
+</div>
+@endsection
