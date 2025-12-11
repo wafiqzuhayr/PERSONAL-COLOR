@@ -10,7 +10,7 @@ Route::get('/personalcolor/basic/start', [PersonalColorController::class, 'basic
 
 Route::get('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'skinTone'])
     ->name('personalcolor.basic.skin-tone');
-
+ 
 Route::post('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'storeSkinTone'])
     ->name('personalcolor.basic.store-skin-tone');
 
