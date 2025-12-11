@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Http\Controller as BaseController;
 
-class PersonalColorController extends Controller
+class Controller extends BaseController
 {
     /**
      * Halaman utama Personal Color
