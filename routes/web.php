@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonalColorController;
 
-<<<<<<< HEAD
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -28,20 +28,20 @@ Route::post('/personalcolor/basic/reset', [PersonalColorController::class, 'rese
 Route::get('/personalcolor/results', [PersonalColorController::class, 'getAllResults'])->name('personalcolor.results');
 Route::get('/personalcolor/results/{id}', [PersonalColorController::class, 'showResult'])->name('personalcolor.show-result');
 Route::delete('/personalcolor/results/{id}', [PersonalColorController::class, 'deleteResult'])->name('personalcolor.delete-result');
-=======
+
 Route::get('/', [PersonalColorController::class, 'welcome'])->name('home');
 
-<<<<<<< HEAD
+
 Route::get('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'skinTone'])
     ->name('personalcolor.basic.skin-tone');
  
 Route::post('/personalcolor/basic/skin-tone', [PersonalColorController::class, 'storeSkinTone'])
     ->name('personalcolor.basic.store-skin-tone');
-=======
+
 Route::prefix('personal-color')->name('personal-color.')->group(function () {
 
     Route::get('/start', [PersonalColorController::class, 'start'])->name('start');
->>>>>>> dcd75b59dda7529bcc714d2dfbdecb333c04ef1f
+
 
     Route::get('/skin-tone', [PersonalColorController::class, 'skinTone'])->name('skin-tone');
     Route::post('/skin-tone', [PersonalColorController::class, 'submitSkinTone'])->name('skin-tone.submit');
@@ -53,4 +53,4 @@ Route::prefix('personal-color')->name('personal-color.')->group(function () {
 
     Route::get('/complete', [PersonalColorController::class, 'complete'])->name('complete');
 });
->>>>>>> e573eb43e36b7b53103681004ea83fb2be061be3
+
