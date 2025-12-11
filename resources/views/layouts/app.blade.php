@@ -12,7 +12,7 @@
 
 <nav class="navbar navbar-dark bg-dark">
     <div class="container">
-        <a href="{{ route('home') }}" class="navbar-brand">
+        <a href="{{ route('welcome') }}" class="navbar-brand">
             Personal Color Analyzer
         </a>
     </div>
